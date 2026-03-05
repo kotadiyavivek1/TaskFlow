@@ -1,4 +1,4 @@
-using TaskFlow.Shared.DTOs;
+using TaskFlow.Shared.DTOs.User;
 namespace TaskFlow.Services.Interfaces;
 
 public interface IUserService
