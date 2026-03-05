@@ -1,0 +1,129 @@
+# TaskFlow — Proper Clean Architecture Restructure
+
+## Final Folder Structure
+
+```
+TaskFlow.sln
+│
+├── TaskFlow.API                    ← Presentation Layer
+│   ├── Controllers/
+│   │   ├── AuthController.cs
+│   │   ├── ProjectController.cs
+│   │   ├── TaskController.cs
+│   │   └── UserController.cs
+│   ├── Extensions/
+│   │   └── ServiceExtensions.cs
+│   ├── Middlewares/
+│   │   └── ExceptionMiddleware.cs
+│   ├── Properties/
+│   ├── Program.cs
+│   └── appsettings.json
+│
+├── TaskFlow.Services               ← Application / Business Logic Layer
+│   ├── DTOs/                       ← DTOs live here (service contracts)
+│   │   ├── Auth/
+│   │   │   ├── LoginRequestDto.cs
+│   │   │   └── LoginResponseDto.cs
+│   │   ├── Project/
+│   │   │   ├── CreateProjectDto.cs
+│   │   │   └── ProjectResponseDto.cs
+│   │   ├── Task/
+│   │   │   ├── CreateTaskDto.cs
+│   │   │   └── TaskResponseDto.cs
+│   │   └── User/
+│   │       ├── CreateUserDto.cs
+│   │       └── UserResponseDto.cs
+│   ├── Interfaces/
+│   │   ├── IAuthService.cs
+│   │   ├── IProjectService.cs
+│   │   ├── ITaskService.cs
+│   │   └── IUserService.cs
+│   └── Implementations/
+│       ├── AuthService.cs
+│       ├── ProjectService.cs
+│       ├── TaskService.cs
+│       └── UserService.cs
+│
+├── TaskFlow.Infrastructure          ← Data Access Layer
+│   ├── Context/
+│   │   └── TaskFlowContext.cs
+│   ├── Repositories/
+│   │   ├── Interfaces/
+│   │   │   ├── IGenericRepository.cs
+│   │   │   └── IUserRepository.cs
+│   │   └── Implementations/
+│   │       ├── GenericRepository.cs
+│   │       └── UserRepository.cs
+│   └── Migrations/
+│
+├── TaskFlow.Domain                  ← Domain / Core Layer
+│   ├── Entities/
+│   │   ├── BaseEntity.cs
+│   │   ├── User.cs
+│   │   ├── Project.cs
+│   │   ├── Role.cs
+│   │   ├── UserRole.cs
+│   │   ├── RefreshToken.cs
+│   │   ├── TaskItem.cs
+│   │   ├── TaskComment.cs
+│   │   ├── TaskAttachment.cs
+│   │   └── TaskHistory.cs
+│   └── Enums/
+│       ├── TaskPriority.cs
+│       └── TaskStatus.cs
+│
+└── TaskFlow.Shared                  ← Cross-cutting Concerns
+    ├── Constants/
+    │   └── AppConstants.cs
+    └── Helpers/
+        └── DateHelper.cs
+```
+
+## Why DTOs go in Services layer
+
+- **Controllers** call services using DTOs — they don't need to know about entities
+- **Services** define DTOs as their input/output contract (like a public API)
+- **Domain entities** are internal to Services + Infrastructure
+- Controllers only import `TaskFlow.Services` (gets DTOs automatically)
+- No circular dependency
+
+## Data Flow
+
+```
+Client → Controller (DTO) → Service (DTO in, Entity out internally) → Repo → DB
+                                                                     ↑
+                                                              TaskFlow.Domain
+```
+
+## Namespace Standards
+
+| Project                 | Namespace Root              |
+|-------------------------|-----------------------------|
+| TaskFlow.API            | TaskFlow.API                |
+| TaskFlow.Services       | TaskFlow.Services           |
+| TaskFlow.Infrastructure | TaskFlow.Infrastructure     |
+| TaskFlow.Domain         | TaskFlow.Domain             |
+| TaskFlow.Shared         | TaskFlow.Shared             |
+
+## Project References
+
+```
+API         → Services, Infrastructure, Shared
+Services    → Domain, Shared
+Infrastructure → Domain, Shared
+Domain      → (none)
+Shared      → (none)
+```
+
+## Steps to Execute
+
+1. Create all folders + placeholder files in `TaskFlow.Services` (DTOs, Interfaces, Implementations)
+2. Create Repositories structure in `TaskFlow.Infrastructure`
+3. Create Controllers folder + stubs in `TaskFlow.API`
+4. Create Extensions + Middlewares folders in `TaskFlow.API`
+5. Create Constants + Helpers in `TaskFlow.Shared`
+6. Update all namespaces across existing files
+7. Update [Program.cs](file:///d:/dotnet-demo/TaskFlow.API/Program.cs) using statements
+8. `dotnet build` — verify clean build
+9. Run EF migration
+
