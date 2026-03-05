@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TaskFlow.Shared.DTOs;
+namespace TaskFlow.Shared.DTOs.User;
 
 public class RegisterUserDto
 {
@@ -12,10 +12,10 @@ public class RegisterUserDto
     [Required]
     [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", 
         ErrorMessage = "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.")]
-    public string PassWord {get;set;} = null!;
+    public string PasswordHash {get;set;} = null!;
     [Required]
-    [Compare("PassWord", ErrorMessage = "Passwords do not match.")]
-    public string ConfirmPassword { get; set; } = null!;    
+    [Compare("PasswordHash", ErrorMessage = "Passwords do not match.")]
+    public string ConfirmPasswordHash { get; set; } = null!;    
     [Required]
     [RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = "Invalid phone number format.")]
     public string PhoneNumber { get; set; } = null!;

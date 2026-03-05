@@ -1,10 +1,19 @@
 namespace TaskFlow.Domain.Entities;
 
-public class TaskHistory
+/// <summary>
+/// Tracks a meaningful state-change event on a TaskItem.
+/// "Who performed the action" is captured by the inherited <see cref="BaseEntity.CreatedBy"/> FK.
+/// "When it happened" is captured by the inherited <see cref="BaseEntity.CreatedAt"/>.
+/// </summary>
+public class TaskHistory : BaseEntity
 {
-    public int Id { get; set; }
+    /// <summary>Short label for the change, e.g. "Status changed to InProgress".</summary>
     public string Action { get; set; } = null!;
-    public string PerformedBy { get; set; } = null!;
-    public DateTime PerformedAt { get; set; }
+
+    /// <summary>Optional extra detail / reason for the change.</summary>
     public string? Remarks { get; set; }
+
+    /// <summary>The task this history entry belongs to.</summary>
+    public int TaskItemId { get; set; }
+    public TaskItem TaskItem { get; set; } = null!;
 }

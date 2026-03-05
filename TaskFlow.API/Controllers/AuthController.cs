@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Services.Interfaces;
-using TaskFlow.Shared.DTOs;
+using TaskFlow.Shared.DTOs.User;
 namespace TaskFlow.API.Controllers;
 
 [ApiController]
