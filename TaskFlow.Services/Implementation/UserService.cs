@@ -2,7 +2,7 @@ using AutoMapper;
 using TaskFlow.Domain.Entities;
 using TaskFlow.Infrastructure.Repositories.Interfaces;
 using TaskFlow.Services.Interfaces;
-using TaskFlow.Shared.DTOs;
+using TaskFlow.Shared.DTOs.User;
 
 namespace TaskFlow.Services.Implementation;
 

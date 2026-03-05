@@ -11,5 +11,6 @@ public class Project : BaseEntity
     public User Owner { get; set; } = null!;
 
     // Navigation
-    public ICollection<TaskItem> Tasks { get; set; } = null!;
+    public ICollection<TaskItem> Tasks { get; set; } = [];
 }
+

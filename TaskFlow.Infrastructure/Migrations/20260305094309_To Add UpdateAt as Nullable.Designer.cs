@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskFlow.Infrastructure.Context;
 
@@ -11,9 +12,11 @@ using TaskFlow.Infrastructure.Context;
 namespace TaskFlow.Infrastructure.Migrations
 {
     [DbContext(typeof(TaskFlowContext))]
-    partial class TaskFlowContextModelSnapshot : ModelSnapshot
+    [Migration("20260305094309_To Add UpdateAt as Nullable")]
+    partial class ToAddUpdateAtasNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,9 +35,6 @@ namespace TaskFlow.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -61,16 +61,9 @@ namespace TaskFlow.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
-
                     b.HasIndex("OwnerId");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("Projects");
                 });
@@ -85,9 +78,6 @@ namespace TaskFlow.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("Expires")
                         .HasColumnType("datetime2");
@@ -105,17 +95,10 @@ namespace TaskFlow.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.HasIndex("UserId");
 
@@ -133,9 +116,6 @@ namespace TaskFlow.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -149,14 +129,7 @@ namespace TaskFlow.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("Roles");
                 });
@@ -169,14 +142,8 @@ namespace TaskFlow.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ContentType")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
 
                     b.Property<string>("FileName")
                         .IsRequired()
@@ -195,16 +162,9 @@ namespace TaskFlow.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
-
                     b.HasIndex("TaskItemId");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("TaskAttachments");
                 });
@@ -224,9 +184,6 @@ namespace TaskFlow.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -236,19 +193,12 @@ namespace TaskFlow.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
-
                     b.HasIndex("TaskItemId");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.HasIndex("UserId");
 
@@ -267,34 +217,22 @@ namespace TaskFlow.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("PerformedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<string>("PerformedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TaskItemId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedBy")
+                    b.Property<int?>("TaskItemId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
-
                     b.HasIndex("TaskItemId");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("TaskHistories");
                 });
@@ -312,9 +250,6 @@ namespace TaskFlow.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -341,18 +276,11 @@ namespace TaskFlow.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AssignedToId");
 
-                    b.HasIndex("CreatedBy");
-
                     b.HasIndex("ProjectId");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("TaskItems");
                 });
@@ -367,9 +295,6 @@ namespace TaskFlow.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -395,14 +320,7 @@ namespace TaskFlow.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("Users");
                 });
@@ -418,9 +336,6 @@ namespace TaskFlow.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -430,180 +345,75 @@ namespace TaskFlow.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
-
                     b.HasIndex("RoleId");
 
-                    b.HasIndex("UpdatedBy");
-
-                    b.HasIndex("UserId", "RoleId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("TaskFlow.Domain.Entities.Project", b =>
                 {
-                    b.HasOne("TaskFlow.Domain.Entities.User", "CreatedByUser")
-                        .WithMany("CreatedProjects")
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("TaskFlow.Domain.Entities.User", "Owner")
                         .WithMany("OwnedProjects")
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskFlow.Domain.Entities.User", "UpdatedByUser")
-                        .WithMany("UpdatedProjects")
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
                     b.Navigation("Owner");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("TaskFlow.Domain.Entities.RefreshToken", b =>
                 {
-                    b.HasOne("TaskFlow.Domain.Entities.User", "CreatedByUser")
-                        .WithMany("CreatedTokens")
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TaskFlow.Domain.Entities.User", "UpdatedByUser")
-                        .WithMany("UpdatedTokens")
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("TaskFlow.Domain.Entities.User", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("UpdatedByUser");
-
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TaskFlow.Domain.Entities.Role", b =>
-                {
-                    b.HasOne("TaskFlow.Domain.Entities.User", "CreatedByUser")
-                        .WithMany("CreatedRoles")
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TaskFlow.Domain.Entities.User", "UpdatedByUser")
-                        .WithMany("UpdatedRoles")
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("TaskFlow.Domain.Entities.TaskAttachment", b =>
                 {
-                    b.HasOne("TaskFlow.Domain.Entities.User", "CreatedByUser")
-                        .WithMany("CreatedAttachments")
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("TaskFlow.Domain.Entities.TaskItem", "TaskItem")
                         .WithMany("Attachments")
                         .HasForeignKey("TaskItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskFlow.Domain.Entities.User", "UpdatedByUser")
-                        .WithMany("UpdatedAttachments")
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
                     b.Navigation("TaskItem");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("TaskFlow.Domain.Entities.TaskComment", b =>
                 {
-                    b.HasOne("TaskFlow.Domain.Entities.User", "CreatedByUser")
-                        .WithMany("CreatedComments")
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("TaskFlow.Domain.Entities.TaskItem", "TaskItem")
                         .WithMany("Comments")
                         .HasForeignKey("TaskItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskFlow.Domain.Entities.User", "UpdatedByUser")
-                        .WithMany("UpdatedComments")
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("TaskFlow.Domain.Entities.User", "User")
-                        .WithMany("TaskComments")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("CreatedByUser");
-
                     b.Navigation("TaskItem");
-
-                    b.Navigation("UpdatedByUser");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("TaskFlow.Domain.Entities.TaskHistory", b =>
                 {
-                    b.HasOne("TaskFlow.Domain.Entities.User", "CreatedByUser")
-                        .WithMany("CreatedHistories")
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TaskFlow.Domain.Entities.TaskItem", "TaskItem")
+                    b.HasOne("TaskFlow.Domain.Entities.TaskItem", null)
                         .WithMany("Histories")
-                        .HasForeignKey("TaskItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TaskFlow.Domain.Entities.User", "UpdatedByUser")
-                        .WithMany("UpdatedHistories")
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("TaskItem");
-
-                    b.Navigation("UpdatedByUser");
+                        .HasForeignKey("TaskItemId");
                 });
 
             modelBuilder.Entity("TaskFlow.Domain.Entities.TaskItem", b =>
@@ -614,68 +424,24 @@ namespace TaskFlow.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TaskFlow.Domain.Entities.User", "CreatedByUser")
-                        .WithMany("CreatedTaskItems")
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("TaskFlow.Domain.Entities.Project", "Project")
                         .WithMany("Tasks")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskFlow.Domain.Entities.User", "UpdatedByUser")
-                        .WithMany("UpdatedTaskItems")
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("AssignedTo");
 
-                    b.Navigation("CreatedByUser");
-
                     b.Navigation("Project");
-
-                    b.Navigation("UpdatedByUser");
-                });
-
-            modelBuilder.Entity("TaskFlow.Domain.Entities.User", b =>
-                {
-                    b.HasOne("TaskFlow.Domain.Entities.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TaskFlow.Domain.Entities.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("TaskFlow.Domain.Entities.UserRole", b =>
                 {
-                    b.HasOne("TaskFlow.Domain.Entities.User", "CreatedByUser")
-                        .WithMany("CreatedUserRoles")
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("TaskFlow.Domain.Entities.Role", "Role")
                         .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("TaskFlow.Domain.Entities.User", "UpdatedByUser")
-                        .WithMany("UpdatedUserRoles")
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TaskFlow.Domain.Entities.User", "User")
                         .WithMany("UserRoles")
@@ -683,11 +449,7 @@ namespace TaskFlow.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CreatedByUser");
-
                     b.Navigation("Role");
-
-                    b.Navigation("UpdatedByUser");
 
                     b.Navigation("User");
                 });
@@ -715,43 +477,9 @@ namespace TaskFlow.Infrastructure.Migrations
                 {
                     b.Navigation("AssignedTasks");
 
-                    b.Navigation("CreatedAttachments");
-
-                    b.Navigation("CreatedComments");
-
-                    b.Navigation("CreatedHistories");
-
-                    b.Navigation("CreatedProjects");
-
-                    b.Navigation("CreatedRoles");
-
-                    b.Navigation("CreatedTaskItems");
-
-                    b.Navigation("CreatedTokens");
-
-                    b.Navigation("CreatedUserRoles");
-
                     b.Navigation("OwnedProjects");
 
                     b.Navigation("RefreshTokens");
-
-                    b.Navigation("TaskComments");
-
-                    b.Navigation("UpdatedAttachments");
-
-                    b.Navigation("UpdatedComments");
-
-                    b.Navigation("UpdatedHistories");
-
-                    b.Navigation("UpdatedProjects");
-
-                    b.Navigation("UpdatedRoles");
-
-                    b.Navigation("UpdatedTaskItems");
-
-                    b.Navigation("UpdatedTokens");
-
-                    b.Navigation("UpdatedUserRoles");
 
                     b.Navigation("UserRoles");
                 });
