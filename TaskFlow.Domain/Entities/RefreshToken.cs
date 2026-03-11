@@ -8,7 +8,7 @@ public class RefreshToken : BaseEntity
     // Revocation
     public bool IsRevoked { get; set; }
     public DateTime RevokedAt { get; set; }
-    public string RevokedByIp { get; set; } = null!;
+    public string? RevokedByIp { get; set; } = null!;
     public string? ReplacedByToken { get; set; }
 
     // IP tracking

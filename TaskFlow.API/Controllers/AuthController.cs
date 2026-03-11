@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,10 +18,10 @@ public class AuthController(
 {
     private readonly JwtSettings _jwt = jwtOptions.Value;
 
-    private string? IpAddress =>
+    private string IpAddress =>
         Request.Headers.TryGetValue("X-Forwarded-For", out var fwd)
-            ? fwd.ToString()
-            : HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
+            ? fwd.ToString().Split(",").First().Trim()
+            : HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() ?? "Unknown";
 
     // ─────────────────────── POST /api/auth/register ─────────────────────────
     /// <summary>Register a new user. Returns an access token; refresh token is set as HttpOnly cookie.</summary>
@@ -58,7 +60,10 @@ public class AuthController(
     }
 
     // ─────────────────────── POST /api/auth/revoke-token ─────────────────────
-    /// <summary>Logout — revokes the current refresh token and clears the cookie.</summary>
+    /// <summary>
+    /// Logout — revokes the current refresh token and clears the cookie.
+    /// In Swagger (where HttpOnly cookies can't be sent), pass the token in the request body.
+    /// </summary>
     [Authorize]
     [HttpPost("revoke-token")]
     public async Task<IActionResult> RevokeToken()
@@ -74,7 +79,7 @@ public class AuthController(
         Response.Cookies.Delete("refreshToken");
         return Ok(new { message = "Logged out successfully." });
     }
-
+    
     // ─────────────────────── GET /api/auth/me ────────────────────────────────
     /// <summary>Returns the current authenticated user's identity from the JWT claims.</summary>
     [Authorize]

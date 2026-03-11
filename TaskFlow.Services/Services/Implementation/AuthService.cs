@@ -21,7 +21,7 @@ public class AuthService(
 
     // ─────────────────────────────────────── REGISTER ────────────────────────
     public async Task RegisterAsync(
-        RegisterUserDto dto, string? ipAddress)
+        RegisterUserDto dto, string ipAddress)
     {
         var normalizedUserName = dto.UserName.ToLowerInvariant();
         var normalizedEmail    = dto.Email.ToLowerInvariant();
@@ -66,7 +66,7 @@ public class AuthService(
 
     // ─────────────────────────────────────── LOGIN ───────────────────────────
     public async Task<(AuthResponseDto Auth, string RawRefreshToken)> LoginAsync(
-        LoginDto dto, string? ipAddress)
+        LoginDto dto, string ipAddress)
     {
         var normalized = dto.UserName.ToLowerInvariant();
 
@@ -88,7 +88,7 @@ public class AuthService(
 
     // ─────────────────────────────────────── REFRESH ─────────────────────────
     public async Task<(AuthResponseDto Auth, string RawRefreshToken)> RefreshTokenAsync(
-        string refreshToken, string? ipAddress)
+        string refreshToken, string ipAddress)
     {
         var stored = await tokenRepo.GetQueryable()
             .Include(rt => rt.User)
@@ -112,7 +112,7 @@ public class AuthService(
     }
 
     // ─────────────────────────────────────── REVOKE ──────────────────────────
-    public async Task<bool> RevokeTokenAsync(string refreshToken, string? ipAddress)
+    public async Task<bool> RevokeTokenAsync(string refreshToken, string ipAddress)
     {
         var stored = await tokenRepo.FindAsync(rt => rt.Token == refreshToken);
         if (stored is null || !stored.IsActive) return false;
@@ -132,7 +132,7 @@ public class AuthService(
             .FirstOrDefaultAsync(u => u.Id == userId);
 
     private async Task<(AuthResponseDto Auth, string RawRefreshToken)> IssueTokensAsync(
-        User user, string? ipAddress, string? preGeneratedToken = null)
+        User user, string ipAddress, string? preGeneratedToken = null)
     {
         var roles = user.UserRoles
             .Where(ur => ur.Role != null)
