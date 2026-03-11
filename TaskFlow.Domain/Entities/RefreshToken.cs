@@ -7,18 +7,18 @@ public class RefreshToken : BaseEntity
 
     // Revocation
     public bool IsRevoked { get; set; }
-    public DateTime RevokedAt { get; set; }
-    public string? RevokedByIp { get; set; } = null!;
+
+    // Rotation / revocation audit
     public string? ReplacedByToken { get; set; }
+    public DateTime? RevokedAt { get; set; }
+    public string? RevokedByIp { get; set; }
+    public string? CreatedByIp { get; set; }
 
-    // IP tracking
-    public string CreatedByIp { get; set; } = null!;
-
-    // Status helper
-    public bool IsExpired => DateTime.UtcNow >= Expires;
-    public bool IsActive   => !IsRevoked && !IsExpired;
-
-    // Relations
+    // FK to User (business)
     public int UserId { get; set; }
     public User User { get; set; } = null!;
+
+    // Computed helpers
+    public bool IsExpired => DateTime.UtcNow >= Expires;
+    public bool IsActive => !IsRevoked && !IsExpired;
 }
