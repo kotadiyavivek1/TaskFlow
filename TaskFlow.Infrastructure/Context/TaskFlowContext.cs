@@ -6,34 +6,35 @@ namespace TaskFlow.Infrastructure.Context;
 public class TaskFlowContext(DbContextOptions<TaskFlowContext> options) : DbContext(options)
 {
     // ── DbSets ────────────────────────────────────────────────────────────────
-    public DbSet<User>           Users           { get; set; }
-    public DbSet<Role>           Roles           { get; set; }
-    public DbSet<UserRole>       UserRoles       { get; set; }
-    public DbSet<Project>        Projects        { get; set; }
-    public DbSet<TaskItem>       TaskItems       { get; set; }
-    public DbSet<TaskComment>    TaskComments    { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<Project> Projects { get; set; }
+    public DbSet<TaskItem> TaskItems { get; set; }
+    public DbSet<TaskComment> TaskComments { get; set; }
     public DbSet<TaskAttachment> TaskAttachments { get; set; }
-    public DbSet<TaskHistory>    TaskHistories   { get; set; }
-    public DbSet<RefreshToken>   RefreshTokens   { get; set; }
+    public DbSet<TaskHistory> TaskHistories { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         // ====================================================================
-        // USER — business FKs
+        // USER — audit self-FKs (nullable: first user has no creator)
         // ====================================================================
-        // User.CreatedBy / UpdatedBy point to itself — must be Restrict
         modelBuilder.Entity<User>()
             .HasOne(e => e.CreatedByUser)
             .WithMany()
             .HasForeignKey(e => e.CreatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<User>()
             .HasOne(e => e.UpdatedByUser)
             .WithMany()
             .HasForeignKey(e => e.UpdatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         // ====================================================================
@@ -43,16 +44,18 @@ public class TaskFlowContext(DbContextOptions<TaskFlowContext> options) : DbCont
             .HasOne(e => e.CreatedByUser)
             .WithMany(u => u.CreatedRoles)
             .HasForeignKey(e => e.CreatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Role>()
             .HasOne(e => e.UpdatedByUser)
             .WithMany(u => u.UpdatedRoles)
             .HasForeignKey(e => e.UpdatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         // ====================================================================
-        // USER ROLE — composite uniqueness + audit FKs
+        // USER ROLE — composite unique index + audit FKs
         // ====================================================================
         modelBuilder.Entity<UserRole>()
             .HasIndex(ur => new { ur.UserId, ur.RoleId })
@@ -62,16 +65,18 @@ public class TaskFlowContext(DbContextOptions<TaskFlowContext> options) : DbCont
             .HasOne(e => e.CreatedByUser)
             .WithMany(u => u.CreatedUserRoles)
             .HasForeignKey(e => e.CreatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<UserRole>()
             .HasOne(e => e.UpdatedByUser)
             .WithMany(u => u.UpdatedUserRoles)
             .HasForeignKey(e => e.UpdatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         // ====================================================================
-        // PROJECT — business FK (Owner) + audit FKs
+        // PROJECT — Owner FK + audit FKs
         // ====================================================================
         modelBuilder.Entity<Project>()
             .HasOne(p => p.Owner)
@@ -83,25 +88,25 @@ public class TaskFlowContext(DbContextOptions<TaskFlowContext> options) : DbCont
             .HasOne(e => e.CreatedByUser)
             .WithMany(u => u.CreatedProjects)
             .HasForeignKey(e => e.CreatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Project>()
             .HasOne(e => e.UpdatedByUser)
             .WithMany(u => u.UpdatedProjects)
             .HasForeignKey(e => e.UpdatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         // ====================================================================
-        // TASK ITEM — business FKs (AssignedTo + Project) + audit FKs
+        // TASK ITEM — business FKs + audit FKs
         // ====================================================================
-        // AssignedTo: Restrict (User -> Tasks would create multiple cascade paths)
         modelBuilder.Entity<TaskItem>()
             .HasOne(t => t.AssignedTo)
             .WithMany(u => u.AssignedTasks)
             .HasForeignKey(t => t.AssignedToId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Project -> TaskItems can cascade (project deletion removes tasks)
         modelBuilder.Entity<TaskItem>()
             .HasOne(t => t.Project)
             .WithMany(p => p.Tasks)
@@ -112,16 +117,18 @@ public class TaskFlowContext(DbContextOptions<TaskFlowContext> options) : DbCont
             .HasOne(e => e.CreatedByUser)
             .WithMany(u => u.CreatedTaskItems)
             .HasForeignKey(e => e.CreatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<TaskItem>()
             .HasOne(e => e.UpdatedByUser)
             .WithMany(u => u.UpdatedTaskItems)
             .HasForeignKey(e => e.UpdatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         // ====================================================================
-        // TASK COMMENT — business FK (User) + audit FKs
+        // TASK COMMENT — business FK + audit FKs
         // ====================================================================
         modelBuilder.Entity<TaskComment>()
             .HasOne(c => c.User)
@@ -133,16 +140,18 @@ public class TaskFlowContext(DbContextOptions<TaskFlowContext> options) : DbCont
             .HasOne(e => e.CreatedByUser)
             .WithMany(u => u.CreatedComments)
             .HasForeignKey(e => e.CreatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<TaskComment>()
             .HasOne(e => e.UpdatedByUser)
             .WithMany(u => u.UpdatedComments)
             .HasForeignKey(e => e.UpdatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         // ====================================================================
-        // TASK ATTACHMENT — business FK (TaskItem) + audit FKs
+        // TASK ATTACHMENT — business FK + audit FKs
         // ====================================================================
         modelBuilder.Entity<TaskAttachment>()
             .HasOne(a => a.TaskItem)
@@ -154,16 +163,18 @@ public class TaskFlowContext(DbContextOptions<TaskFlowContext> options) : DbCont
             .HasOne(e => e.CreatedByUser)
             .WithMany(u => u.CreatedAttachments)
             .HasForeignKey(e => e.CreatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<TaskAttachment>()
             .HasOne(e => e.UpdatedByUser)
             .WithMany(u => u.UpdatedAttachments)
             .HasForeignKey(e => e.UpdatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         // ====================================================================
-        // TASK HISTORY — business FK (TaskItem) + audit FKs
+        // TASK HISTORY — business FK + audit FKs
         // ====================================================================
         modelBuilder.Entity<TaskHistory>()
             .HasOne(h => h.TaskItem)
@@ -175,16 +186,18 @@ public class TaskFlowContext(DbContextOptions<TaskFlowContext> options) : DbCont
             .HasOne(e => e.CreatedByUser)
             .WithMany(u => u.CreatedHistories)
             .HasForeignKey(e => e.CreatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<TaskHistory>()
             .HasOne(e => e.UpdatedByUser)
             .WithMany(u => u.UpdatedHistories)
             .HasForeignKey(e => e.UpdatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         // ====================================================================
-        // REFRESH TOKEN — business FK (User) + audit FKs
+        // REFRESH TOKEN — business FK + audit FKs
         // ====================================================================
         modelBuilder.Entity<RefreshToken>()
             .HasOne(r => r.User)
@@ -196,12 +209,14 @@ public class TaskFlowContext(DbContextOptions<TaskFlowContext> options) : DbCont
             .HasOne(e => e.CreatedByUser)
             .WithMany(u => u.CreatedTokens)
             .HasForeignKey(e => e.CreatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<RefreshToken>()
             .HasOne(e => e.UpdatedByUser)
             .WithMany(u => u.UpdatedTokens)
             .HasForeignKey(e => e.UpdatedBy)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         // ====================================================================

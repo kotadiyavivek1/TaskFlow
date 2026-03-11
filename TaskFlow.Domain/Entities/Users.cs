@@ -1,7 +1,12 @@
+using Microsoft.EntityFrameworkCore;
 namespace TaskFlow.Domain.Entities;
+
+[Index(nameof(UserName), IsUnique = true)]
+[Index(nameof(Email), IsUnique = true)]
 public class User : BaseEntity
 {
     public string FullName { get; set; } = null!;
+    public string UserName { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
     public string? PhoneNumber { get; set; }

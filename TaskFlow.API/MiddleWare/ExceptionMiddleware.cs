@@ -3,18 +3,17 @@ using System.Text.Json;
 
 namespace TaskFlow.API.MiddleWare;
 
-public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddleware> _logger)
+public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
 {
     public async Task InvokeAsync(HttpContext context)
     {
         try
         {
-            await _next(context); // move to next middleware
+            await next(context);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred");
-
+            logger.LogError(ex, "Unhandled exception: {Message}", ex.Message);
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -25,18 +24,20 @@ public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddlew
 
         context.Response.StatusCode = exception switch
         {
-            KeyNotFoundException => (int)HttpStatusCode.NotFound,
             UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
-            ArgumentException => (int)HttpStatusCode.BadRequest,
-            _ => (int)HttpStatusCode.InternalServerError
+            InvalidOperationException   => (int)HttpStatusCode.BadRequest,
+            KeyNotFoundException        => (int)HttpStatusCode.NotFound,
+            ArgumentException           => (int)HttpStatusCode.BadRequest,
+            _                           => (int)HttpStatusCode.InternalServerError,
         };
 
-        var result = JsonSerializer.Serialize(new
+        var payload = JsonSerializer.Serialize(new
         {
-            message = exception.Message,
-            statusCode = context.Response.StatusCode
-        });
+            success    = false,
+            message    = exception.Message,
+            statusCode = context.Response.StatusCode,
+        }, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
-        return context.Response.WriteAsync(result);
+        return context.Response.WriteAsync(payload);
     }
 }
