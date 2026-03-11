@@ -23,10 +23,14 @@ public class AuthService(
     public async Task RegisterAsync(
         RegisterUserDto dto, string? ipAddress)
     {
-        var normalized = dto.UserName.ToLowerInvariant();
+        var normalizedUserName = dto.UserName.ToLowerInvariant();
+        var normalizedEmail    = dto.Email.ToLowerInvariant();
 
-        if (await userRepo.ExistsAsync(u => u.UserName == normalized))
-            throw new InvalidOperationException("Username is already registered.");
+        if (await userRepo.ExistsAsync(u => u.UserName == normalizedUserName))
+            throw new InvalidOperationException("Username is already taken.");
+
+        if (await userRepo.ExistsAsync(u => u.Email == normalizedEmail))
+            throw new InvalidOperationException("Email is already registered.");
 
         // Validate role exists
         var role = await roleRepo.GetByIdAsync(dto.RoleId)
@@ -36,7 +40,8 @@ public class AuthService(
         var user = new User
         {
             FullName     = dto.FullName,
-            Email        = normalized,
+            UserName     = normalizedUserName,
+            Email        = normalizedEmail,
             PasswordHash = BC.HashPassword(dto.Password),
             PhoneNumber  = dto.PhoneNumber,
             IsActive     = true,
@@ -65,17 +70,18 @@ public class AuthService(
     {
         var normalized = dto.UserName.ToLowerInvariant();
 
+        // Support login by either username or email
         var user = await userRepo.GetQueryable()
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
-            .FirstOrDefaultAsync(u => u.Email == normalized)
-            ?? throw new UnauthorizedAccessException("Invalid email or password.");
+            .FirstOrDefaultAsync(u => u.UserName == normalized || u.Email == normalized)
+            ?? throw new UnauthorizedAccessException("Invalid username/email or password.");
 
         if (!user.IsActive)
             throw new UnauthorizedAccessException("Account is disabled.");
 
         if (!BC.Verify(dto.Password, user.PasswordHash))
-            throw new UnauthorizedAccessException("Invalid email or password.");
+            throw new UnauthorizedAccessException("Invalid username/email or password.");
 
         return await IssueTokensAsync(user, ipAddress);
     }
