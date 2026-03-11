@@ -1,21 +1,27 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TaskFlow.Services.Implementation;
-using TaskFlow.Services.Interfaces;
+using TaskFlow.Services.Services.Implementation;
+using TaskFlow.Services.Services.Interfaces;
+using TaskFlow.Shared.Settings;
 
 namespace TaskFlow.Services.DependencyInjection;
 
 public class DependencyInjection
 {
-    public static IServiceCollection AddServices(IServiceCollection services)
+    public static IServiceCollection AddServices(IServiceCollection services, IConfiguration configuration)
     {
-        // Register Services Here   
-        services.AddScoped<IUserService, UserService>();
+        // Bind JWT settings from appsettings.json
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+
+        // Register services
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IAuthService,  AuthService>();
+
         return services;
     }
 
     public static IServiceCollection AddInfrastructure(IServiceCollection services)
     {
-        // Register Services Here   
         Infrastructure.DependencyInjection.DependencyInjection.AddInfrastructure(services);
         return services;
     }
