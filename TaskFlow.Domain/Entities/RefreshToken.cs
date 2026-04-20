@@ -4,6 +4,8 @@ public class RefreshToken : BaseEntity
 {
     public string Token { get; set; } = null!;
     public DateTime Expires { get; set; }
+
+    // Revocation
     public bool IsRevoked { get; set; }
 
     // Rotation / revocation audit
