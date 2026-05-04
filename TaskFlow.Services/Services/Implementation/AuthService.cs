@@ -21,12 +21,16 @@ public class AuthService(
 
     // ─────────────────────────────────────── REGISTER ────────────────────────
     public async Task RegisterAsync(
-        RegisterUserDto dto, string? ipAddress)
+        RegisterUserDto dto, string ipAddress)
     {
-        var normalized = dto.UserName.ToLowerInvariant();
+        var normalizedUserName = dto.UserName.ToLowerInvariant();
+        var normalizedEmail    = dto.Email.ToLowerInvariant();
 
-        if (await userRepo.ExistsAsync(u => u.UserName == normalized))
-            throw new InvalidOperationException("Username is already registered.");
+        if (await userRepo.ExistsAsync(u => u.UserName == normalizedUserName))
+            throw new InvalidOperationException("Username is already taken.");
+
+        if (await userRepo.ExistsAsync(u => u.Email == normalizedEmail))
+            throw new InvalidOperationException("Email is already registered.");
 
         // Validate role exists
         var role = await roleRepo.GetByIdAsync(dto.RoleId)
@@ -36,7 +40,8 @@ public class AuthService(
         var user = new User
         {
             FullName     = dto.FullName,
-            Email        = normalized,
+            UserName     = normalizedUserName,
+            Email        = normalizedEmail,
             PasswordHash = BC.HashPassword(dto.Password),
             PhoneNumber  = dto.PhoneNumber,
             IsActive     = true,
@@ -61,28 +66,29 @@ public class AuthService(
 
     // ─────────────────────────────────────── LOGIN ───────────────────────────
     public async Task<(AuthResponseDto Auth, string RawRefreshToken)> LoginAsync(
-        LoginDto dto, string? ipAddress)
+        LoginDto dto, string ipAddress)
     {
         var normalized = dto.UserName.ToLowerInvariant();
 
+        // Support login by either username or email
         var user = await userRepo.GetQueryable()
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
-            .FirstOrDefaultAsync(u => u.Email == normalized)
-            ?? throw new UnauthorizedAccessException("Invalid email or password.");
+            .FirstOrDefaultAsync(u => u.UserName == normalized || u.Email == normalized)
+            ?? throw new UnauthorizedAccessException("Invalid username/email or password.");
 
         if (!user.IsActive)
             throw new UnauthorizedAccessException("Account is disabled.");
 
         if (!BC.Verify(dto.Password, user.PasswordHash))
-            throw new UnauthorizedAccessException("Invalid email or password.");
+            throw new UnauthorizedAccessException("Invalid username/email or password.");
 
         return await IssueTokensAsync(user, ipAddress);
     }
 
     // ─────────────────────────────────────── REFRESH ─────────────────────────
     public async Task<(AuthResponseDto Auth, string RawRefreshToken)> RefreshTokenAsync(
-        string refreshToken, string? ipAddress)
+        string refreshToken, string ipAddress)
     {
         var stored = await tokenRepo.GetQueryable()
             .Include(rt => rt.User)
@@ -106,7 +112,7 @@ public class AuthService(
     }
 
     // ─────────────────────────────────────── REVOKE ──────────────────────────
-    public async Task<bool> RevokeTokenAsync(string refreshToken, string? ipAddress)
+    public async Task<bool> RevokeTokenAsync(string refreshToken, string ipAddress)
     {
         var stored = await tokenRepo.FindAsync(rt => rt.Token == refreshToken);
         if (stored is null || !stored.IsActive) return false;
@@ -126,7 +132,7 @@ public class AuthService(
             .FirstOrDefaultAsync(u => u.Id == userId);
 
     private async Task<(AuthResponseDto Auth, string RawRefreshToken)> IssueTokensAsync(
-        User user, string? ipAddress, string? preGeneratedToken = null)
+        User user, string ipAddress, string? preGeneratedToken = null)
     {
         var roles = user.UserRoles
             .Where(ur => ur.Role != null)
